@@ -131,8 +131,14 @@ s32 DoPoisonFieldEffect(void)
         {
             // Apply poison damage
             hp = GetMonData(pokemon, MON_DATA_HP);
+#if POISON_DOESNT_FAINT
+            if (hp > 1)
+                hp--;
+            // else hp stays at 1; never faint on the field
+#else
             if (hp == 0 || --hp == 0)
                 numFainted++;
+#endif
 
             SetMonData(pokemon, MON_DATA_HP, &hp);
             numPoisoned++;

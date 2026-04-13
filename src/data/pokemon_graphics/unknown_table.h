@@ -441,4 +441,10 @@ static const u32 sUnused[] =
     [SPECIES_UNOWN_Z]     = 0x888,
     [SPECIES_UNOWN_EMARK] = 0x888,
     [SPECIES_UNOWN_QMARK] = 0x888,
+    [SPECIES_FLARION] = 0x0,
+    [SPECIES_AZURUNE] = 0x0,
+    [SPECIES_TERRAPYON] = 0x0,
+    [SPECIES_LEAFLING] = 0x0,
+    [SPECIES_LEAFLIN2] = 0x0,
+    [SPECIES_CINDERPUP] = 0x0,
 };

@@ -4643,4 +4643,76 @@ const struct PokedexEntry gPokedexEntries[] =
         .trainerScale = 290,
         .trainerOffset = 2,
     },
+    [NATIONAL_DEX_FLARION] =
+    {
+        .categoryName = _("EMBER"),
+        .height = 12,
+        .weight = 500,
+        .description = gFlarionPokedexText,
+        .pokemonScale = 256,
+        .pokemonOffset = 0,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_AZURUNE] =
+    {
+        .categoryName = _("RUNESONG"),
+        .height = 14,
+        .weight = 320,
+        .description = gAzurunePokedexText,
+        .pokemonScale = 256,
+        .pokemonOffset = 0,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_TERRAPYON] =
+    {
+        .categoryName = _("BULWARK"),
+        .height = 21,
+        .weight = 3800,
+        .description = gTerrapyonPokedexText,
+        .pokemonScale = 256,
+        .pokemonOffset = 0,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_LEAFLING] =
+    {
+        .categoryName = _("LEAFLET"),
+        .height = 4,
+        .weight = 35,
+        .description = gLeaflingPokedexText,
+        .pokemonScale = 256,
+        .pokemonOffset = 0,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_LEAFLIN2] =
+    {
+        .categoryName = _("BLOSSOM"),
+        .height = 8,
+        .weight = 120,
+        .description = gLeaflin2PokedexText,
+        .pokemonScale = 256,
+        .pokemonOffset = 0,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_CINDERPUP] =
+    {
+        .categoryName = _("CINDER"),
+        .height = 5,
+        .weight = 70,
+        .description = gCinderpupPokedexText,
+        .pokemonScale = 256,
+        .pokemonOffset = 0,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
 };

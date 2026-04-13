@@ -335,6 +335,7 @@ struct BattleMove
     u8 target;
     s8 priority;
     u8 flags;
+    u8 split;       // SPLIT_PHYSICAL / SPLIT_SPECIAL / SPLIT_STATUS (unused unless PHYSICAL_SPECIAL_SPLIT is on)
 };
 
 #define SPINDA_SPOT_WIDTH 16

@@ -1055,8 +1055,14 @@ void Bike_HandleBumpySlopeJump(void)
 
 bool32 IsRunningDisallowed(u8 metatile)
 {
+#if RUN_ANYWHERE
+    // Ignore per-map gMapHeader.allowRunning; only the per-metatile
+    // disallow list (tall grass, etc.) still blocks dashing.
+    return IsRunningDisallowedByMetatile(metatile) == TRUE;
+#else
     if (!gMapHeader.allowRunning || IsRunningDisallowedByMetatile(metatile) == TRUE)
         return TRUE;
     else
         return FALSE;
+#endif
 }

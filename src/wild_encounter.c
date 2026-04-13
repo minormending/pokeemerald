@@ -556,6 +556,9 @@ bool8 StandardWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior)
 
     if (sWildEncountersDisabled == TRUE)
         return FALSE;
+#if NO_RANDOM_ENCOUNTERS
+    return FALSE;
+#endif
 
     headerId = GetCurrentMapWildMonHeaderId();
     if (headerId == HEADER_NONE)

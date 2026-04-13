@@ -413,4 +413,10 @@ const u8 *const gMonFootprintTable[] =
     [SPECIES_DEOXYS] = gMonFootprint_Deoxys,
     [SPECIES_CHIMECHO] = gMonFootprint_Chimecho,
     [SPECIES_EGG] = gMonFootprint_Bulbasaur,
+    [SPECIES_FLARION] = gMonFootprint_Charizard,
+    [SPECIES_AZURUNE] = gMonFootprint_Latias,
+    [SPECIES_TERRAPYON] = gMonFootprint_Aggron,
+    [SPECIES_LEAFLING] = gMonFootprint_Roselia,
+    [SPECIES_LEAFLIN2] = gMonFootprint_Vileplume,
+    [SPECIES_CINDERPUP] = gMonFootprint_Growlithe,
 };

@@ -2319,3 +2319,39 @@ const u8 gDeoxysPokedexText[] = _(
     "extraterrestrial virus exposed to a laser\n"
     "beam. Its body is configured for superior\n"
     "agility and speed.");
+
+const u8 gFlarionPokedexText[] = _(
+    "A fierce dragon said to breathe\n"
+    "sapphire fire that can melt steel at a\n"
+    "glance.\n"
+    "");
+
+const u8 gAzurunePokedexText[] = _(
+    "An elegant water spirit whose tail\n"
+    "glows with ancient runes that sing\n"
+    "lullabies to sleeping sailors.\n"
+    "");
+
+const u8 gTerrapyonPokedexText[] = _(
+    "A colossal tortoise whose shell is\n"
+    "forged from meteor iron and is said to\n"
+    "shrug off earthquakes.\n"
+    "");
+
+const u8 gLeaflingPokedexText[] = _(
+    "A tiny forest sprite that dances in\n"
+    "the breeze and spreads shimmering\n"
+    "pollen on lucky trainers.\n"
+    "");
+
+const u8 gLeaflin2PokedexText[] = _(
+    "The evolved form of LEAFLING; its\n"
+    "petals glitter like stained glass at\n"
+    "dawn.\n"
+    "");
+
+const u8 gCinderpupPokedexText[] = _(
+    "A spirited pup whose fur smolders with\n"
+    "playful embers.\n"
+    "\n"
+    "");

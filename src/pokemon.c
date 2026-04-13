@@ -2262,6 +2262,17 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     SetBoxMonData(boxMon, MON_DATA_POKEBALL, &value);
     SetBoxMonData(boxMon, MON_DATA_OT_GENDER, &gSaveBlock2Ptr->playerGender);
 
+#if PERFECT_IVS
+    {
+        u32 iv = MAX_PER_STAT_IVS;
+        SetBoxMonData(boxMon, MON_DATA_HP_IV, &iv);
+        SetBoxMonData(boxMon, MON_DATA_ATK_IV, &iv);
+        SetBoxMonData(boxMon, MON_DATA_DEF_IV, &iv);
+        SetBoxMonData(boxMon, MON_DATA_SPEED_IV, &iv);
+        SetBoxMonData(boxMon, MON_DATA_SPATK_IV, &iv);
+        SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv);
+    }
+#else
     if (fixedIV < USE_RANDOM_IVS)
     {
         SetBoxMonData(boxMon, MON_DATA_HP_IV, &fixedIV);
@@ -2292,6 +2303,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
         iv = (value & (MAX_IV_MASK << 10)) >> 10;
         SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv);
     }
+#endif
 
     if (gSpeciesInfo[species].abilities[1])
     {
@@ -3173,7 +3185,11 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
         if (attackerHoldEffect == sHoldEffectToType[i][0]
             && type == sHoldEffectToType[i][1])
         {
+#if PHYSICAL_SPECIAL_SPLIT
+            if (IS_MOVE_PHYSICAL(move))
+#else
             if (IS_TYPE_PHYSICAL(type))
+#endif
                 attack = (attack * (attackerHoldEffectParam + 100)) / 100;
             else
                 spAttack = (spAttack * (attackerHoldEffectParam + 100)) / 100;
@@ -3229,7 +3245,11 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
     if (gBattleMoves[gCurrentMove].effect == EFFECT_EXPLOSION)
         defense /= 2;
 
+#if PHYSICAL_SPECIAL_SPLIT
+    if (IS_MOVE_PHYSICAL(move))
+#else
     if (IS_TYPE_PHYSICAL(type))
+#endif
     {
         if (gCritMultiplier == 2)
         {
@@ -3284,7 +3304,11 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
     if (type == TYPE_MYSTERY)
         damage = 0; // is ??? type. does 0 damage.
 
+#if PHYSICAL_SPECIAL_SPLIT
+    if (IS_MOVE_SPECIAL(move))
+#else
     if (IS_TYPE_SPECIAL(type))
+#endif
     {
         if (gCritMultiplier == 2)
         {

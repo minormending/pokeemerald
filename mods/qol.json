@@ -1,0 +1,17 @@
+{
+  "config": {
+    "perfect_ivs": true,
+    "exp_multiplier": 3,
+    "catch_rate_bonus": 3,
+    "never_miss": true,
+    "unlimited_tms": true,
+    "instant_text": true,
+    "run_anywhere": true,
+    "skip_intro": true,
+    "starting_money": 30000,
+    "shiny_odds": 512,
+    "catch_exp": true,
+    "exp_all": true,
+    "poison_doesnt_faint": true
+  }
+}

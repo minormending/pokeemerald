@@ -1153,7 +1153,11 @@ static void Cmd_accuracycheck(void)
             calc = (calc * 130) / 100; // 1.3 compound eyes boost
         if (WEATHER_HAS_EFFECT && gBattleMons[gBattlerTarget].ability == ABILITY_SAND_VEIL && gBattleWeather & B_WEATHER_SANDSTORM)
             calc = (calc * 80) / 100; // 1.2 sand veil loss
+#if PHYSICAL_SPECIAL_SPLIT
+        if (gBattleMons[gBattlerAttacker].ability == ABILITY_HUSTLE && IS_MOVE_PHYSICAL(move))
+#else
         if (gBattleMons[gBattlerAttacker].ability == ABILITY_HUSTLE && IS_TYPE_PHYSICAL(type))
+#endif
             calc = (calc * 80) / 100; // 1.2 hustle loss
 
         if (gBattleMons[gBattlerTarget].item == ITEM_ENIGMA_BERRY)
@@ -1173,6 +1177,10 @@ static void Cmd_accuracycheck(void)
             calc = (calc * (100 - param)) / 100;
 
         // final calculation
+#if NEVER_MISS
+        if (GetBattlerSide(gBattlerAttacker) == B_SIDE_PLAYER)
+            calc = 101; // guarantees the Random() % 100 + 1 > calc check fails
+#endif
         if ((Random() % 100 + 1) > calc)
         {
             gMoveResultFlags |= MOVE_RESULT_MISSED;
@@ -1273,6 +1281,9 @@ static void Cmd_critcalc(void)
                 + 2 * (holdEffect == HOLD_EFFECT_LUCKY_PUNCH && gBattleMons[gBattlerAttacker].species == SPECIES_CHANSEY)
                 + 2 * (holdEffect == HOLD_EFFECT_STICK && gBattleMons[gBattlerAttacker].species == SPECIES_FARFETCHD);
 
+#if CRIT_RATE_BONUS > 0
+    critChance += CRIT_RATE_BONUS;
+#endif
     if (critChance >= ARRAY_COUNT(sCriticalHitChance))
         critChance = ARRAY_COUNT(sCriticalHitChance) - 1;
 
@@ -1935,7 +1946,11 @@ static void Cmd_datahpupdate(void)
                 // Note: While physicalDmg/specialDmg below are only distinguished between for Counter/Mirror Coat, they are
                 //       used in combination as general damage trackers for other purposes. specialDmg is additionally used
                 //       to help determine if a fire move should defrost the target.
+#if PHYSICAL_SPECIAL_SPLIT
+                if (IS_MOVE_PHYSICAL(gCurrentMove) && !(gHitMarker & HITMARKER_PASSIVE_HP_UPDATE) && gCurrentMove != MOVE_PAIN_SPLIT)
+#else
                 if (IS_TYPE_PHYSICAL(moveType) && !(gHitMarker & HITMARKER_PASSIVE_HP_UPDATE) && gCurrentMove != MOVE_PAIN_SPLIT)
+#endif
                 {
                     // Record physical damage/attacker for Counter
                     gProtectStructs[gActiveBattler].physicalDmg = gHpDealt;
@@ -1951,7 +1966,11 @@ static void Cmd_datahpupdate(void)
                         gSpecialStatuses[gActiveBattler].physicalBattlerId = gBattlerTarget;
                     }
                 }
+#if PHYSICAL_SPECIAL_SPLIT
+                else if (IS_MOVE_SPECIAL(gCurrentMove) && !(gHitMarker & HITMARKER_PASSIVE_HP_UPDATE))
+#else
                 else if (!IS_TYPE_PHYSICAL(moveType) && !(gHitMarker & HITMARKER_PASSIVE_HP_UPDATE))
+#endif
                 {
                     // Record special damage/attacker for Mirror Coat
                     gProtectStructs[gActiveBattler].specialDmg = gHpDealt;
@@ -3289,6 +3308,16 @@ static void Cmd_getexp(void)
             u16 calculatedExp;
             s32 viaSentIn;
 
+#if EXP_ALL
+            // Treat every alive party member as if it had been sent in,
+            // so exp is split evenly across the whole party.
+            for (i = 0; i < PARTY_SIZE; i++)
+            {
+                if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE
+                 && GetMonData(&gPlayerParty[i], MON_DATA_HP) != 0)
+                    sentIn |= gBitTable[i];
+            }
+#endif
             for (viaSentIn = 0, i = 0; i < PARTY_SIZE; i++)
             {
                 if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_NONE || GetMonData(&gPlayerParty[i], MON_DATA_HP) == 0)
@@ -3308,6 +3337,9 @@ static void Cmd_getexp(void)
             }
 
             calculatedExp = gSpeciesInfo[gBattleMons[gBattlerFainted].species].expYield * gBattleMons[gBattlerFainted].level / 7;
+#if EXP_MULTIPLIER > 1
+            calculatedExp *= EXP_MULTIPLIER;
+#endif
 
             if (viaExpShare) // at least one mon is getting exp via exp share
             {
@@ -9902,6 +9934,53 @@ static void Cmd_removelightscreenreflect(void)
     gBattlescriptCurrInstr++;
 }
 
+#if CATCH_EXP
+// Award experience to every alive party member as if the caught Pokémon
+// had fainted. Sets exp + level silently; stats recalc on next battle.
+static void AwardCatchExp(u16 species, u8 level)
+{
+    u32 i, baseExp, perMon, aliveCount = 0;
+    baseExp = gSpeciesInfo[species].expYield * level / 7;
+#if EXP_MULTIPLIER > 1
+    baseExp *= EXP_MULTIPLIER;
+#endif
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_NONE)
+            continue;
+        if (GetMonData(&gPlayerParty[i], MON_DATA_HP) == 0)
+            continue;
+        if (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL) >= MAX_LEVEL)
+            continue;
+        aliveCount++;
+    }
+    if (aliveCount == 0)
+        return;
+    perMon = baseExp / aliveCount;
+    if (perMon == 0)
+        perMon = 1;
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        u32 newExp, newLevel;
+        u16 sp = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+        if (sp == SPECIES_NONE)
+            continue;
+        if (GetMonData(&gPlayerParty[i], MON_DATA_HP) == 0)
+            continue;
+        if (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL) >= MAX_LEVEL)
+            continue;
+        newExp = GetMonData(&gPlayerParty[i], MON_DATA_EXP) + perMon;
+        // Cap at the exp needed for MAX_LEVEL.
+        if (newExp > gExperienceTables[gSpeciesInfo[sp].growthRate][MAX_LEVEL])
+            newExp = gExperienceTables[gSpeciesInfo[sp].growthRate][MAX_LEVEL];
+        SetMonData(&gPlayerParty[i], MON_DATA_EXP, &newExp);
+        newLevel = GetLevelFromMonExp(&gPlayerParty[i]);
+        SetMonData(&gPlayerParty[i], MON_DATA_LEVEL, &newLevel);
+        CalculateMonStats(&gPlayerParty[i]);
+    }
+}
+#endif
+
 static void Cmd_handleballthrow(void)
 {
     u8 ballMultiplier = 0;
@@ -9992,6 +10071,9 @@ static void Cmd_handleballthrow(void)
             odds *= 2;
         if (gBattleMons[gBattlerTarget].status1 & (STATUS1_POISON | STATUS1_BURN | STATUS1_PARALYSIS | STATUS1_TOXIC_POISON))
             odds = (odds * 15) / 10;
+#if CATCH_RATE_BONUS > 1
+        odds *= CATCH_RATE_BONUS;
+#endif
 
         if (gLastUsedItem != ITEM_SAFARI_BALL)
         {
@@ -10012,6 +10094,9 @@ static void Cmd_handleballthrow(void)
             MarkBattlerForControllerExec(gActiveBattler);
             gBattlescriptCurrInstr = BattleScript_SuccessBallThrow;
             SetMonData(&gEnemyParty[gBattlerPartyIndexes[gBattlerTarget]], MON_DATA_POKEBALL, &gLastUsedItem);
+#if CATCH_EXP
+            AwardCatchExp(gBattleMons[gBattlerTarget].species, gBattleMons[gBattlerTarget].level);
+#endif
 
             if (CalculatePlayerPartyCount() == PARTY_SIZE)
                 gBattleCommunication[MULTISTRING_CHOOSER] = 0;
@@ -10037,6 +10122,9 @@ static void Cmd_handleballthrow(void)
             {
                 gBattlescriptCurrInstr = BattleScript_SuccessBallThrow;
                 SetMonData(&gEnemyParty[gBattlerPartyIndexes[gBattlerTarget]], MON_DATA_POKEBALL, &gLastUsedItem);
+#if CATCH_EXP
+                AwardCatchExp(gBattleMons[gBattlerTarget].species, gBattleMons[gBattlerTarget].level);
+#endif
 
                 if (CalculatePlayerPartyCount() == PARTY_SIZE)
                     gBattleCommunication[MULTISTRING_CHOOSER] = 0;

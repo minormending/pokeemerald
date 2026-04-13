@@ -440,4 +440,10 @@ const struct CompressedSpritePalette gMonShinyPaletteTable[] =
     SPECIES_SHINY_PAL(UNOWN_Z, gMonShinyPalette_Unown),
     SPECIES_SHINY_PAL(UNOWN_EMARK, gMonShinyPalette_Unown),
     SPECIES_SHINY_PAL(UNOWN_QMARK, gMonShinyPalette_Unown),
+    SPECIES_SHINY_PAL(FLARION, gMonShinyPalette_Charizard),
+    SPECIES_SHINY_PAL(AZURUNE, gMonShinyPalette_Latias),
+    SPECIES_SHINY_PAL(TERRAPYON, gMonShinyPalette_Aggron),
+    SPECIES_SHINY_PAL(LEAFLING, gMonShinyPalette_Roselia),
+    SPECIES_SHINY_PAL(LEAFLIN2, gMonShinyPalette_Vileplume),
+    SPECIES_SHINY_PAL(CINDERPUP, gMonShinyPalette_Growlithe),
 };

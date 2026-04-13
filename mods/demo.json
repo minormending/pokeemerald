@@ -1,0 +1,30 @@
+{
+  "species": [
+    {
+      "name": "CINDERPUP",
+      "types": ["FIRE"],
+      "stats": [45, 60, 40, 65, 55, 40],
+      "ability": "BLAZE",
+      "clone_from": "GROWLITHE",
+      "category": "CINDER",
+      "height": 5,
+      "weight": 70,
+      "dex_text": "A spirited pup whose fur smolders with playful embers.",
+      "body_color": "RED",
+      "growth_rate": "MEDIUM_SLOW",
+      "gender_ratio": "PERCENT_FEMALE(12.5)",
+      "learnset": [[1, "TACKLE"], [1, "LEER"], [8, "EMBER"], [18, "BITE"], [30, "FLAMETHROWER"]]
+    }
+  ],
+  "evolutions": [
+    { "from": "CINDERPUP", "to": "ARCANINE", "method": "ITEM", "param": "ITEM_FIRE_STONE" }
+  ],
+  "wilds": [
+    { "map": "MAP_ROUTE103", "field": "land_mons", "slot": 0,
+      "species": "CINDERPUP", "level": 4, "max_level": 6 }
+  ],
+  "edits": [
+    { "species": "MUDKIP", "base_attack": 80 }
+  ],
+  "config": { "shiny_odds": 1024 }
+}

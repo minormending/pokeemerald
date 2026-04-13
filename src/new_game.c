@@ -130,6 +130,60 @@ static void WarpToTruck(void)
     WarpIntoMap();
 }
 
+#if QUICK_TEST
+#include "script_pokemon_util.h"
+#include "constants/species.h"
+#include "constants/moves.h"
+#include "constants/items.h"
+#include "constants/flags.h"
+
+// Drop the player on Route 102 instead of inside the truck, and hand them
+// a party tuned to exercise the Physical/Special split.
+static void QuickTest_SetupParty(void)
+{
+    struct {
+        u16 species;
+        u8  level;
+        u16 item;
+        u16 moves[4];
+    } mons[] = {
+        // Alakazam: huge SpAtk, trash Atk. Under vanilla Gen 3, Shadow
+        // Ball uses Atk and is useless here. Under PHYSICAL_SPECIAL_SPLIT
+        // Shadow Ball becomes Special and hits like a truck.
+        { SPECIES_ALAKAZAM, 50, ITEM_NONE,
+          { MOVE_PSYCHIC, MOVE_SHADOW_BALL, MOVE_CALM_MIND, MOVE_RECOVER } },
+        // Machamp: huge Atk. Ice Punch is Special in vanilla (useless);
+        // becomes Physical under the split and hits hard.
+        { SPECIES_MACHAMP, 50, ITEM_NONE,
+          { MOVE_CROSS_CHOP, MOVE_ICE_PUNCH, MOVE_ROCK_SLIDE, MOVE_BULK_UP } },
+        // Gardevoir: balanced. Useful as a control.
+        { SPECIES_GARDEVOIR, 50, ITEM_NONE,
+          { MOVE_PSYCHIC, MOVE_THUNDERBOLT, MOVE_CALM_MIND, MOVE_MOONLIGHT } },
+    };
+    u32 i, j;
+    for (i = 0; i < ARRAY_COUNT(mons); i++)
+    {
+        ScriptGiveMon(mons[i].species, mons[i].level, mons[i].item, 0, 0, 0);
+        for (j = 0; j < 4; j++)
+        {
+            if (mons[i].moves[j] != MOVE_NONE)
+                SetMonMoveSlot(&gPlayerParty[i], mons[i].moves[j], j);
+        }
+    }
+    // Running shoes + POKEMON menu entry so you can run and open party.
+    FlagSet(FLAG_SYS_POKEMON_GET);
+    FlagSet(FLAG_SYS_B_DASH);
+    // Mark Pokédex as received so the summary screen is fully usable.
+    FlagSet(FLAG_SYS_POKEDEX_GET);
+}
+
+static void QuickTest_WarpToRoute102(void)
+{
+    SetWarpDestination(MAP_GROUP(MAP_ROUTE102), MAP_NUM(MAP_ROUTE102), WARP_ID_NONE, 5, 5);
+    WarpIntoMap();
+}
+#endif
+
 void Sav2_ClearSetDefault(void)
 {
     ClearSav2();
@@ -169,7 +223,7 @@ void NewGameInitData(void)
     ResetGabbyAndTy();
     ClearSecretBases();
     ClearBerryTrees();
-    SetMoney(&gSaveBlock1Ptr->money, 3000);
+    SetMoney(&gSaveBlock1Ptr->money, STARTING_MONEY);
     SetCoins(0);
     ResetLinkContestBoolean();
     ResetGameStats();
@@ -192,7 +246,12 @@ void NewGameInitData(void)
     InitDewfordTrend();
     ResetFanClub();
     ResetLotteryCorner();
+#if QUICK_TEST
+    QuickTest_WarpToRoute102();
+    QuickTest_SetupParty();
+#else
     WarpToTruck();
+#endif
     RunScriptImmediately(EventScript_ResetAllMapFlags);
     ResetMiniGamesRecords();
     InitUnionRoomChatRegisteredTexts();

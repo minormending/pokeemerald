@@ -440,4 +440,10 @@ const struct CompressedSpritePalette gMonPaletteTable[] =
     SPECIES_PAL(UNOWN_Z, gMonPalette_Unown),
     SPECIES_PAL(UNOWN_EMARK, gMonPalette_Unown),
     SPECIES_PAL(UNOWN_QMARK, gMonPalette_Unown),
+    SPECIES_PAL(FLARION, gMonPalette_Charizard),
+    SPECIES_PAL(AZURUNE, gMonPalette_Latias),
+    SPECIES_PAL(TERRAPYON, gMonPalette_Aggron),
+    SPECIES_PAL(LEAFLING, gMonPalette_Roselia),
+    SPECIES_PAL(LEAFLIN2, gMonPalette_Vileplume),
+    SPECIES_PAL(CINDERPUP, gMonPalette_Growlithe),
 };

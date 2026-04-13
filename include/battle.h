@@ -464,6 +464,20 @@ STATIC_ASSERT(sizeof(((struct BattleStruct *)0)->palaceFlags) * 8 >= MAX_BATTLER
 #define IS_TYPE_PHYSICAL(moveType) (moveType < TYPE_MYSTERY)
 #define IS_TYPE_SPECIAL(moveType) (moveType > TYPE_MYSTERY)
 
+// Move-based physical/special split. When PHYSICAL_SPECIAL_SPLIT is on,
+// each move's category comes from its .split field. When off, it is
+// derived from the move's type (the vanilla Gen 1–3 rule).
+#include "constants/battle_split.h"
+#if PHYSICAL_SPECIAL_SPLIT
+  #define IS_MOVE_PHYSICAL(move) (gBattleMoves[(move)].split == SPLIT_PHYSICAL)
+  #define IS_MOVE_SPECIAL(move)  (gBattleMoves[(move)].split == SPLIT_SPECIAL)
+  #define IS_MOVE_STATUS(move)   (gBattleMoves[(move)].split == SPLIT_STATUS)
+#else
+  #define IS_MOVE_PHYSICAL(move) (gBattleMoves[(move)].power != 0 && IS_TYPE_PHYSICAL(gBattleMoves[(move)].type))
+  #define IS_MOVE_SPECIAL(move)  (gBattleMoves[(move)].power != 0 && IS_TYPE_SPECIAL(gBattleMoves[(move)].type))
+  #define IS_MOVE_STATUS(move)   (gBattleMoves[(move)].power == 0)
+#endif
+
 #define TARGET_TURN_DAMAGED ((gSpecialStatuses[gBattlerTarget].physicalDmg != 0 || gSpecialStatuses[gBattlerTarget].specialDmg != 0))
 
 #define IS_BATTLER_OF_TYPE(battler, type) ((gBattleMons[battler].types[0] == type || gBattleMons[battler].types[1] == type))

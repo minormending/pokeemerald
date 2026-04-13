@@ -5695,4 +5695,10 @@ const union AnimCmd *const *const gMonFrontAnimsPtrTable[] =
     [SPECIES_UNOWN_EMARK] = sAnims_UnownEMark,
     [SPECIES_UNOWN_QMARK] = sAnims_UnownQMark,
 
+    [SPECIES_FLARION] = sAnims_Charizard,
+    [SPECIES_AZURUNE] = sAnims_Latias,
+    [SPECIES_TERRAPYON] = sAnims_Aggron,
+    [SPECIES_LEAFLING] = sAnims_Roselia,
+    [SPECIES_LEAFLIN2] = sAnims_Vileplume,
+    [SPECIES_CINDERPUP] = sAnims_Growlithe,
 };
