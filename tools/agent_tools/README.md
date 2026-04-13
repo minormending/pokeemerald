@@ -5,8 +5,19 @@ Their job: turn "add a new Pokémon" into one command instead of 15
 hand-edits.
 
 This file is the developer-facing reference. If you've never used the
-tooling before, start with **`AGENTS.md`** in the repo root — it has a
-gentler introduction, install instructions, and full worked examples.
+tooling before, start with the other docs first:
+
+- [**AGENTS.md**](../../AGENTS.md) — main hub: install, first build,
+  "what you can do", step-by-step tutorial.
+- [docs/MODS.md](../../docs/MODS.md) — optional compile-time mods
+  (perfect IVs, never-miss, physical/special split, etc.).
+- [docs/MOD_PACKS.md](../../docs/MOD_PACKS.md) — JSON bundles of
+  operations.
+- [docs/QUICK_TEST.md](../../docs/QUICK_TEST.md) — fast iteration
+  harness for battle-side mods.
+- [docs/TROUBLESHOOTING.md](../../docs/TROUBLESHOOTING.md) — common
+  failures and fixes.
+- [CLAUDE.md](../../CLAUDE.md) — rules for AI agents.
 
 ---
 
@@ -332,78 +343,16 @@ than failing obscurely.
 
 ## Optional mods
 
-Compile-time switches. Flip with `tweak_config.py`, rebuild, done. All
-default to disabled / vanilla values; you opt in explicitly.
+Compile-time switches. Flip with `tweak_config.py`, rebuild, done.
 
-### Integer knobs
+Full reference (flags, defaults, effects, hook files):
+[**docs/MODS.md**](../../docs/MODS.md).
 
-| Flag | `#define` | Default | What it controls |
-|---|---|---|---|
-| `--shiny-odds N`       | `SHINY_ODDS` *(pokemon.h)* | 8    | Shiny probability numerator over 65536. Vanilla ≈ 1/8192. |
-| `--exp-multiplier N`   | `EXP_MULTIPLIER`           | 1    | Multiplies XP gained in battle. |
-| `--catch-rate-bonus N` | `CATCH_RATE_BONUS`         | 1    | Multiplies capture odds at throw time. |
-| `--crit-rate-bonus N`  | `CRIT_RATE_BONUS`          | 0    | Adds stages to the crit chance index. |
-| `--starting-money N`   | `STARTING_MONEY`           | 3000 | Pokédollars on new-game. |
+Full reference for the mod-pack JSON bundle format:
+[**docs/MOD_PACKS.md**](../../docs/MOD_PACKS.md).
 
-### Boolean switches (pass `on` / `off`)
-
-| Flag | `#define` | Hook file |
-|---|---|---|
-| `--perfect-ivs`          | `PERFECT_IVS`          | `src/pokemon.c::CreateBoxMon` |
-| `--never-miss`           | `NEVER_MISS`           | `src/battle_script_commands.c::Cmd_accuracycheck` |
-| `--no-random-encounters` | `NO_RANDOM_ENCOUNTERS` | `src/wild_encounter.c::StandardWildEncounter` |
-| `--unlimited-tms`        | `UNLIMITED_TMS`        | `src/party_menu.c::Task_LearnedMove` |
-| `--instant-text`         | `INSTANT_TEXT`         | `src/menu.c::GetPlayerTextSpeedDelay` |
-| `--run-anywhere`         | `RUN_ANYWHERE`         | `src/bike.c::IsRunningDisallowed` |
-| `--skip-intro`           | `SKIP_INTRO`           | `src/intro.c::SetUpCopyrightScreen` |
-| `--catch-exp`            | `CATCH_EXP`            | `src/battle_script_commands.c::AwardCatchExp` |
-| `--exp-all`              | `EXP_ALL`              | `src/battle_script_commands.c::Cmd_getexp` |
-| `--poison-doesnt-faint`  | `POISON_DOESNT_FAINT`  | `src/field_poison.c::DoPoisonFieldEffect` |
-| `--physical-special-split`| `PHYSICAL_SPECIAL_SPLIT` | `src/pokemon.c::CalculateBaseDamage` + Counter/Mirror-Coat routing |
-| `--quick-test`           | `QUICK_TEST`           | `src/new_game.c::NewGameInitData` — drops the player on Route 102 with a pre-built Lv50 party instead of the truck sequence. |
-
-### Combining
-
-Any mix in one invocation:
-
-```bash
-python3 tools/agent_tools/tweak_config.py \
-    --perfect-ivs on --exp-multiplier 3 --catch-rate-bonus 3 \
-    --never-miss on --unlimited-tms on --instant-text on \
-    --run-anywhere on --skip-intro on --starting-money 30000 \
-    --shiny-odds 512
-```
-
-Or via a `mod_pack.py` `"config": { ... }` block using snake_case keys
-(`perfect_ivs`, `exp_multiplier`, `never_miss`, etc.).
-
----
-
-## Fast in-game testing for battle mods
-
-Save states are emulator-specific and don't travel between builds. For
-iterating on battle-side mods (split, never-miss, exp, etc.) without
-replaying the intro every rebuild, enable `QUICK_TEST`:
-
-```bash
-python3 tools/agent_tools/tweak_config.py \
-    --quick-test on --skip-intro on --instant-text on
-python3 tools/agent_tools/build.py
-```
-
-On New Game you wake up on Route 102 with Alakazam / Machamp / Gardevoir
-at Lv 50, movesets tuned to exercise the Physical/Special split (and
-handy for testing crit / miss / exp too). Walk one tile into the grass
-to trigger a wild encounter. Total time from `make` to first battle:
-~10 seconds.
-
-Turn it off when you're done: `--quick-test off` + rebuild + new save.
-The harness is a testing-only harness — it skips every story flag, so
-continuing a QUICK_TEST save on a non-harness build shows inconsistent
-world state.
-
-See `AGENTS.md § Fast testing: the QUICK_TEST harness` for the full
-party table and rationale.
+Fast iteration harness for battle-side mods:
+[**docs/QUICK_TEST.md**](../../docs/QUICK_TEST.md).
 
 ## Design notes
 
@@ -464,35 +413,4 @@ row to `tweak_config.py`'s `INT_KNOBS` / `BOOL_MODS` table. Done.
 
 ## Troubleshooting
 
-### Anchor not found / Anchor not unique
-
-The script expected a specific text in a source file and didn't find it
-(or found multiple copies). Usually cause: the change was already
-applied, or the file was hand-edited. Roll back the file
-(`git checkout -- path/to/file`) and re-run.
-
-### Build succeeds but the ROM crashes
-
-Run `python3 tools/agent_tools/verify_rom.py`. If it reports `fatal` or
-`undefined instruction`, check your most recent addition for a typo in
-a constant name (`TYPE_`, `ABILITY_`, `MOVE_`, `ITEM_`).
-
-### `error: 'TYPE_FAIRY' undeclared`
-
-Generation 3 doesn't have the Fairy type. Pick another type.
-
-### `error: 'MOVE_XYZ' undeclared`
-
-You referenced a Gen 4+ move name. Check it exists in
-`include/constants/moves.h`, or add it first with `add_move.py`.
-
-### mGBA hangs under `xvfb-run`
-
-Known cosmetic issue — `xvfb-run` sometimes doesn't forward SIGTERM.
-`pkill -9 -f mgba` clears it. Does not affect normal mGBA use when you
-open the ROM yourself.
-
-### `RemoveBagItem not declared` or similar
-
-You accidentally edited an `#include` line. Check `git diff src/` and
-restore the offending file.
+Full problem → fix list: [**docs/TROUBLESHOOTING.md**](../../docs/TROUBLESHOOTING.md).

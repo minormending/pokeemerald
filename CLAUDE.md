@@ -132,6 +132,9 @@ character map. When you write tools, edit in `latin-1` or use
 
 ## Optional mods
 
+**User-facing reference:** [`docs/MODS.md`](docs/MODS.md).
+This section is the quick hook-table for agents.
+
 Every mod is a single `#define` in `include/config.h` (the one
 exception, `SHINY_ODDS`, lives in `include/constants/pokemon.h`). Each
 is gated by `#if FLAG …` at exactly one hook in the engine. Disabling
@@ -185,6 +188,8 @@ sites. Add the define to `include/config.h`, add a row to
 ---
 
 ## Fast in-game testing: `QUICK_TEST`
+
+**User-facing reference:** [`docs/QUICK_TEST.md`](docs/QUICK_TEST.md).
 
 When a user asks to test a battle-side mod (split, never-miss, crit,
 exp, etc.) and doesn't want to replay the intro, enable `QUICK_TEST`.
@@ -328,7 +333,11 @@ benefits.
 
 ## Where to get help yourself
 
-- `AGENTS.md` — the user-facing README. More examples and troubleshooting.
-- `tools/agent_tools/README.md` — the script-by-script developer reference.
+- [`AGENTS.md`](AGENTS.md) — user-facing README and hub; start here if unsure.
+- [`docs/MODS.md`](docs/MODS.md) — full reference for every compile-time mod toggle.
+- [`docs/MOD_PACKS.md`](docs/MOD_PACKS.md) — JSON schema for bundled operations.
+- [`docs/QUICK_TEST.md`](docs/QUICK_TEST.md) — testing harness for fast iteration.
+- [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) — common failures and fixes.
+- [`tools/agent_tools/README.md`](tools/agent_tools/README.md) — script-by-script developer reference.
 - `mods/*.json` — worked mod-pack examples.
 - Upstream: https://github.com/pret/pokeemerald — the decomp community.
